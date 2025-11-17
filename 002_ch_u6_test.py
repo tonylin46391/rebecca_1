@@ -1,6 +1,5 @@
 import streamlit as st
-from gtts import gTTS, gTTSError
-import io
+import os
 import datetime
 import pandas as pd
 
@@ -11,6 +10,9 @@ words = [
     "月亮", "風乾", "香甜", "遊客", "買書",
     "親朋好友", "如意", "進去", "最近", "學校"
 ]
+
+# 音檔所在資料夾（請在專案下建立 audio 資料夾，放入對應 mp3）
+AUDIO_DIR = "audio"
 
 # 初始化 session state
 if "index" not in st.session_state:
@@ -32,48 +34,35 @@ if "played" not in st.session_state:
 if "last_word" not in st.session_state:
     st.session_state.last_word = None
 
-st.markdown('<p style="font-size:26px">🎧 聽音辨字練習</p>', unsafe_allow_html=True)
+st.markdown('<p style="font-size:26px">🎧 聽音辨字練習（預載 mp3 版本）</p>', unsafe_allow_html=True)
 
 
-# ✅ 加入錯誤處理的 TTS 函式
-def generate_tts(word: str, lang: str = "zh-tw") -> bool:
+# ✅ 播放「預先準備好的 mp3」的函式（不再使用 gTTS）
+def play_preloaded_audio(word: str) -> bool:
     """
-    使用 gTTS 產生語音並播放。
-    回傳 True 表示成功，False 表示失敗（發生 gTTSError 或其他錯誤）。
+    播放對應單字的本地 mp3 檔案。
+    檔名規則：audio/小鎮.mp3、audio/柿餅.mp3 ...
+    回傳 True = 播放成功；False = 找不到檔案或讀取失敗。
     """
     word = (word or "").strip()
     if not word:
-        st.warning("沒有可以轉語音的文字。")
+        st.warning("沒有可以播放的文字。")
+        return False
+
+    # 檔名：audio/<單字>.mp3
+    filename = os.path.join(AUDIO_DIR, f"{word}.mp3")
+
+    if not os.path.exists(filename):
+        st.warning(f"⚠️ 找不到音檔：{filename}，請確認檔案是否存在。")
         return False
 
     try:
-        # 建立 gTTS 物件（注意語言代碼用 zh-tw）
-        tts = gTTS(text=word, lang=lang)
-
-        # 建立記憶體緩衝區
-        fp = io.BytesIO()
-        tts.write_to_fp(fp)              # 這裡如果連線或配額有問題，就會丟 gTTSError
-        fp.seek(0)
-
-        # 播放音訊
-        st.audio(fp, format="audio/mp3")
+        with open(filename, "rb") as f:
+            audio_bytes = f.read()
+        st.audio(audio_bytes, format="audio/mp3")
         return True
-
-    except gTTSError:
-        # gTTS 跟 Google TTS 溝通出問題時會進來這裡
-        st.error(
-            "🔊 語音服務目前發生問題（gTTSError）。\n\n"
-            "可能原因：\n"
-            "1）目前連不上 Google TTS（網路或防火牆限制）。\n"
-            "2）短時間內請求太頻繁，被 Google 暫時拒絕。\n"
-            "3）執行環境（例如雲端服務）限制了對外連線。\n\n"
-            "建議：稍後再試一次，或減少自動播放的次數。"
-        )
-        return False
-
     except Exception as e:
-        # 其他非 gTTSError 的錯誤
-        st.error(f"產生語音時發生未預期錯誤：{e}")
+        st.error(f"讀取音檔時發生錯誤：{e}")
         return False
 
 
@@ -115,7 +104,7 @@ input_key = f"input_{current_word}_{st.session_state.index}_{st.session_state.mo
 
 # 🔊 自動播放音訊（只有在新題目，或尚未播放成功時才播）
 if (not st.session_state.played) or (st.session_state.last_word != current_word):
-    ok = generate_tts(current_word)
+    ok = play_preloaded_audio(current_word)
     st.session_state.played = ok      # 只有成功才標記已播放
     st.session_state.last_word = current_word if ok else None
 
@@ -170,7 +159,7 @@ def submit_answer():
 
 # 輸入表單
 with st.form(key=f"form_{current_word}", clear_on_submit=False):
-    st.text_input("請輸入你聽到的『中文字』：",  # 比較符合現在的題目
+    st.text_input("請輸入你聽到的『中文字』：",
                   key=input_key,
                   autocomplete="off")
     st.form_submit_button("提交答案", on_click=submit_answer)
