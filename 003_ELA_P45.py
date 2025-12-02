@@ -7,35 +7,51 @@ import os # 用來讀取本地 mp3 檔案
 word_bank = [
     {"word": "agency", "translation": "代辦處；經銷處；政府機構",
      "sentence": "Many people worked at the agency.",
-     "sentence_zh": "許多人在這家代辦處工作。"},
+     "sentence_zh": "許多人在這家代辦處工作。",
+     "definition": "If you work at an agency, your job is to help others to get something done.",
+     "definition_zh": "如果你在一家代辦處工作，你的工作就是幫助別人完成一些事情。"},
     
     {"word": "business", "translation": "生意；業務；商店",
      "sentence": "My aunt opened a small business that sells coffee.",
-     "sentence_zh": "我阿姨開了一家賣咖啡的小店。"},
+     "sentence_zh": "我阿姨開了一家賣咖啡的小店。",
+     "definition": "A place open for business is ready to work, buy, or sell something.",
+     "definition_zh": "一個開放做生意的地方，就是準備好工作、購買或販售某物的場所。"},
      
     {"word": "confidently", "translation": "自信地；有信心地",
      "sentence": "Tia confidently stood up to give her report.",
-     "sentence_zh": "Tia 自信地站起來做報告。"},
+     "sentence_zh": "Tia 自信地站起來做報告。",
+     "definition": "When you do something confidently, you are sure you will do it well.",
+     "definition_zh": "當你自信地做某事時，你確信自己能做得很好。"},
      
     {"word": "eagerly", "translation": "熱切地；渴望地",
      "sentence": "The family eagerly explored their new home.",
-     "sentence_zh": "這家人熱切地探索他們的新家。"},
+     "sentence_zh": "這家人熱切地探索他們的新家。",
+     "definition": "When you do something eagerly, you really want to do it.",
+     "definition_zh": "當你熱切地做某事時，你真的很想做它。"},
      
     {"word": "seeps", "translation": "滲出；緩慢穿過",
      "sentence": "The sand seeps through the hourglass.",
-     "sentence_zh": "沙子緩慢地從沙漏中滲出。"},
+     "sentence_zh": "沙子緩慢地從沙漏中滲出。",
+     "definition": "When something seeps, it passes slowly through a small opening.",
+     "definition_zh": "當某物滲出時，它會緩慢地穿過一個小開口。"},
      
     {"word": "mystery", "translation": "謎；難以理解的事物",
      "sentence": "The contents of the box are a mystery.",
-     "sentence_zh": "箱子裡的內容物是個謎。"},
+     "sentence_zh": "箱子裡的內容物是個謎。",
+     "definition": "A mystery is something that is hard to understand or is not known about.",
+     "definition_zh": "謎是難以理解或不為人知的事物。"},
      
     {"word": "ace", "translation": "高手；一流人才",
-     "sentence": "He is an ace athlete.",
-     "sentence_zh": "他是一位一流的運動員。"},
+     "sentence": "He is an an ace athlete.",
+     "sentence_zh": "他是一位一流的運動員。",
+     "definition": "Someone described as an ace is extremely good at something.",
+     "definition_zh": "被描述為高手的人，在某方面是非常優秀的。"},
      
     {"word": "located", "translation": "位於；坐落於",
      "sentence": "The alligator pond was located near the center of the zoo.",
-     "sentence_zh": "鱷魚池位於動物園的中心附近。"},
+     "sentence_zh": "鱷魚池位於動物園的中心附近。",
+     "definition": "Where something is located is where it is.",
+     "definition_zh": "某物被定位（located）的地方就是它所在的位置。"},
 ]
 
 
@@ -57,7 +73,8 @@ def play_audio(filepath: str):
 
 # --- 初始化 Session State ---
 total_questions = len(word_bank)
-current_word_hash = hash(tuple(item['word'] for item in word_bank))
+# 確保 hash 包含新的欄位，讓新的 word_bank 會觸發初始化
+current_word_hash = hash(tuple((item['word'], item.get('definition_zh')) for item in word_bank))
 
 if "word_bank_hash" not in st.session_state or st.session_state.word_bank_hash != current_word_hash:
     st.session_state.wrong_queue = []
@@ -72,7 +89,7 @@ if "word_bank_hash" not in st.session_state or st.session_state.word_bank_hash !
 else:
     # 確保 last_message 存在
     if "last_message" not in st.session_state:
-         st.session_state.last_message = ""
+        st.session_state.last_message = ""
 
 # --- 邏輯控制函式 ---
 
@@ -130,12 +147,18 @@ current_word = current_item["word"]
 translation = current_item["translation"]
 sentence = current_item["sentence"]
 sentence_zh = current_item["sentence_zh"]
+definition = current_item.get("definition", "N/A")
+definition_zh = current_item.get("definition_zh", "N/A") 
+
 
 # 組合音檔路徑
 base_name = f"{current_index + 1:02d}_{current_word}"
-word_audio_path    = os.path.join(AUDIO_DIR, f"{base_name}_word_en.mp3")
+word_audio_path     = os.path.join(AUDIO_DIR, f"{base_name}_word_en.mp3")
 sent_en_audio_path = os.path.join(AUDIO_DIR, f"{base_name}_sent_en.mp3")
 sent_zh_audio_path = os.path.join(AUDIO_DIR, f"{base_name}_sent_zh.mp3")
+# 【修改：新增定義音檔路徑】
+def_en_audio_path  = os.path.join(AUDIO_DIR, f"{base_name}_def_en.mp3")
+def_zh_audio_path  = os.path.join(AUDIO_DIR, f"{base_name}_def_zh.mp3")
 
 
 # --- 標題與狀態顯示 ---
@@ -163,27 +186,38 @@ else:
     if display_progress == total_questions: display_progress = 0
     st.info(f"📖 順序學習模式 (進度 {display_progress + 1} / {total_questions})")
 
-st.markdown("<p style='font-size:18px'>📌 發音按鈕 (單字 / 英文例句 / 中文翻譯)</p>", unsafe_allow_html=True)
+# 【修改：更新按鈕標題，包含定義】
+st.markdown("<p style='font-size:18px'>📌 發音按鈕 (單字 / 英文例句 / 中文翻譯 / 英文定義 / 中文定義)</p>", unsafe_allow_html=True)
 st.markdown("<p style='font-size:18px'>✏️ 單字測驗</p>", unsafe_allow_html=True)
 
-# --- 三個發音按鈕 ---
-col1, col2, col3 = st.columns(3)
+# --- 五個發音按鈕 ---
+col1, col2, col3, col4, col5 = st.columns(5) # 【修改：欄位數增加到 5 個】
 with col1:
-    if st.button("▶ 單字（英文）"):
+    if st.button("▶ 單字（英）"):
         play_audio(word_audio_path)
 with col2:
-    if st.button("▶ 例句（英文）"):
+    if st.button("▶ 例句（英）"):
         play_audio(sent_en_audio_path)
 with col3:
-    if st.button("▶ 中文翻譯"):
+    if st.button("▶ 例句（中）"):
         play_audio(sent_zh_audio_path)
+with col4: # 【新增：英文定義按鈕】
+    if st.button("▶ 定義（英）"):
+        play_audio(def_en_audio_path)
+with col5: # 【新增：中文定義按鈕】
+    if st.button("▶ 定義（中）"):
+        play_audio(def_zh_audio_path)
+
 
 # 顯示文字
 st.write(f"中文單字翻譯：**{translation}**")
 st.write(f"英文例句：*{sentence}*")
 st.write(f"中文翻譯：*{sentence_zh}*")
+st.markdown(f"**英文定義：** *{definition}*") 
+st.write(f"中文定義：*{definition_zh}*") 
 
-# --- 單字答題表單 ---
+
+# --- 單字答題表單 (此處不變) ---
 input_key = f"input_{current_index}_{st.session_state.study_mode}" 
 
 with st.form(key=f"form_{current_index}", clear_on_submit=True):
@@ -211,7 +245,7 @@ with st.form(key=f"form_{current_index}", clear_on_submit=True):
                 st.session_state.wrong_queue.append(current_index) # 答錯後加入錯題隊列
             
             if st.session_state.study_mode == 'REVIEW' and current_index in st.session_state.wrong_queue:
-                 if st.session_state.wrong_queue[0] == current_index:
+                if st.session_state.wrong_queue[0] == current_index:
                     item = st.session_state.wrong_queue.pop(0)
                     st.session_state.wrong_queue.append(item)
 
@@ -229,7 +263,7 @@ with st.form(key=f"form_{current_index}", clear_on_submit=True):
         go_next_question()
         st.rerun()
 
-# --- 側邊欄統計 ---
+# --- 側邊欄統計 (此處不變) ---
 st.sidebar.header("📊 練習進度統計")
 st.sidebar.write(f"目前模式：**{st.session_state.study_mode}**")
 st.sidebar.write(f"待複習錯題數：{len(st.session_state.wrong_queue)}")
