@@ -8,86 +8,54 @@ from gtts import gTTS
 import io
 
 word_bank = [
-    {
-        "word": "pronounce",
-        "translation": "發音 (v.)",
-        "sentence": "It is difficult to pronounce some words in English correctly.",
-        "sentence_zh": "要正確地發音某些英文字是很困難的。",
-        "definition": "To make the sound of a word or letter in a particular way.",
-        "definition_zh": "以特定的方式發出一個單字或字母的聲音。"
-    },
-    {
-        "word": "scoundrel",
-        "translation": "惡棍；流氓 (n.)",
-        "sentence": "The scoundrel disappeared with everyone's money and was never seen again.",
-        "sentence_zh": "那個惡棍帶著大家的錢消失了，再也沒有出現。",
-        "definition": "A man who treats other people badly, especially by not being honest or moral.",
-        "definition_zh": "對待他人很差，尤其是不誠實或不道德的人。"
-    },
-    {
-        "word": "snowplow",
-        "translation": "掃雪機；除雪機 (n.)",
-        "sentence": "You can often see snowplows on the roads in Canada in winter.",
-        "sentence_zh": "在冬天，你經常可以在加拿大的道路上看到掃雪機。",
-        "definition": "A vehicle or machine for cleaning snow from roads.",
-        "definition_zh": "一種用於清理道路積雪的車輛或機器。"
-    },
-    {
-        "word": "withdrawal",
-        "translation": "提款；取出 (n.)",
-        "sentence": "I made a large withdrawal yesterday to buy a new car.",
-        "sentence_zh": "我昨天進行了一筆大額提款，用來買新車。",
-        "definition": "The act of taking an amount of money out of your bank account.",
-        "definition_zh": "從你的銀行帳戶中取出一定金額金錢的行為。"
-    },
-    {
-        "word": "astronaut",
-        "translation": "太空人；宇航員 (n.)",
-        "sentence": "Neil Armstrong was the first astronaut to walk on the moon.",
-        "sentence_zh": "尼爾·阿姆斯壯是第一個在月球上行走的太空人。",
-        "definition": "Someone who travels in space.",
-        "definition_zh": "在太空中旅行的人。"
-    },
-    {
-        "word": "auction",
-        "translation": "拍賣 (n.)",
-        "sentence": "The painting sold for millions in the auction.",
-        "sentence_zh": "這幅畫在拍賣會上以數百萬的價格售出。",
-        "definition": "A public sale in which things are sold to the person who offers the most money for them.",
-        "definition_zh": "一種公開銷售，物品賣給出價最高的人。"
-    },
-    {
-        "word": "moisture",
-        "translation": "濕氣；水分 (n.)",
-        "sentence": "The plant's roots draw moisture from the soil.",
-        "sentence_zh": "植物的根從土壤中吸收水分。",
-        "definition": "Very small drops of water or other liquid that are present in the air or on a surface.",
-        "definition_zh": "存在於空氣中或物體表面上非常微小的水滴或其他液體。"
-    },
-    {
-        "word": "pointless",
-        "translation": "無意義的；沒有目的的 (adj.)",
-        "sentence": "It is pointless trying and fly if you don't have wings.",
-        "sentence_zh": "如果你沒有翅膀，嘗試飛行是沒有意義的。",
-        "definition": "Having no purpose or not worth doing.",
-        "definition_zh": "沒有目的或不值得做的事。"
-    },
-    {
-        "word": "annoying",
-        "translation": "惱人的；使人煩躁的 (adj.)",
-        "sentence": "Some students are very annoying.",
-        "sentence_zh": "有些學生非常惱人。",
-        "definition": "Making somebody feel slightly angry.",
-        "definition_zh": "使某人感到輕微生氣。"
-    },
-    {
-        "word": "spaghetti",
-        "translation": "義大利麵（細長麵條） (n.)",
-        "sentence": "Spaghetti in Italy is delicious.",
-        "sentence_zh": "義大利的義大利麵很美味。",
-        "definition": "Pasta in the shape of long thin pieces that look like string when they are cooked.",
-        "definition_zh": "煮熟後看起來像細繩狀的長條形麵食。"
-    }
+    {"word": "agency", "translation": "代辦處；經銷處；政府機構",
+     "sentence": "Many people worked at the agency.",
+     "sentence_zh": "許多人在這家代辦處工作。",
+     "definition": "If you work at an agency, your job is to help others to get something done.",
+     "definition_zh": "如果你在一家代辦處工作，你的工作就是幫助別人完成一些事情。"},
+    
+    {"word": "business", "translation": "生意；業務；商店",
+     "sentence": "My aunt opened a small business that sells coffee.",
+     "sentence_zh": "我阿姨開了一家賣咖啡的小店。",
+     "definition": "A place open for business is ready to work, buy, or sell something.",
+     "definition_zh": "一個開放做生意的地方，就是準備好工作、購買或販售某物的場所。"},
+     
+    {"word": "confidently", "translation": "自信地；有信心地",
+     "sentence": "Tia confidently stood up to give her report.",
+     "sentence_zh": "Tia 自信地站起來做報告。",
+     "definition": "When you do something confidently, you are sure you will do it well.",
+     "definition_zh": "當你自信地做某事時，你確信自己能做得很好。"},
+     
+    {"word": "eagerly", "translation": "熱切地；渴望地",
+     "sentence": "The family eagerly explored their new home.",
+     "sentence_zh": "這家人熱切地探索他們的新家。",
+     "definition": "When you do something eagerly, you really want to do it.",
+     "definition_zh": "當你熱切地做某事時，你真的很想做它。"},
+     
+    {"word": "seeps", "translation": "滲出；緩慢穿過",
+     "sentence": "The sand seeps through the hourglass.",
+     "sentence_zh": "沙子緩慢地從沙漏中滲出。",
+     "definition": "When something seeps, it passes slowly through a small opening.",
+     "definition_zh": "當某物滲出時，它會緩慢地穿過一個小開口。"},
+     
+    {"word": "mystery", "translation": "謎；難以理解的事物",
+     "sentence": "The contents of the box are a mystery.",
+     "sentence_zh": "箱子裡的內容物是個謎。",
+     "definition": "A mystery is something that is hard to understand or is not known about.",
+     "definition_zh": "謎是難以理解或不為人知的事物。"},
+     
+    {"word": "ace", "translation": "高手；一流人才",
+     # 【修正】移除原單字中句子的 typo "an an"
+     "sentence": "He is an ace athlete.",
+     "sentence_zh": "他是一位一流的運動員。",
+     "definition": "Someone described as an ace is extremely good at something.",
+     "definition_zh": "被描述為高手的人，在某方面是非常優秀的。"},
+     
+    {"word": "located", "translation": "位於；坐落於",
+     "sentence": "The alligator pond was located near the center of the zoo.",
+     "sentence_zh": "鱷魚池位於動物園的中心附近。",
+     "definition": "Where something is located is where it is.",
+     "definition_zh": "某物被定位（located）的地方就是它所在的位置。"},
 ]
 
 # --- 播放函式 (處理本地檔案) ---
