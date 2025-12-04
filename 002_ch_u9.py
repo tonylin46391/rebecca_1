@@ -222,40 +222,21 @@ else:
     st.info(f"📖 順序學習模式 (進度 {display_progress + 1} / {total_questions})")
 
 
-# --- Dolingo 圖片與按鈕區塊 ---
+# --- Dolingo 圖片與按鈕區塊 (已修改：圖片在左，按鈕在右，並垂直居中) ---
 
-# *** 調整佈局：將圖片置中，並將按鈕放在下一行 (或緊跟在圖片後) ***
-# 圖片置中：使用 1:1:1 欄位比例
-col_left, col_img, col_right = st.columns([1, 1, 1])
-
-# 圖片顯示在中間欄位
-with col_img:
-    try:
-        # 取得目前程式碼所在的資料夾路徑
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        # 組合出圖片的完整路徑
-        image_path = os.path.join(current_dir, "Dolingo.jpg")
-        
-        # 顯示圖片
-        st.image(image_path, width=100)
-    except Exception as e:
-        # 如果找不到圖片，印出錯誤訊息方便除錯
-        print(f"圖片讀取錯誤: {e}")
-        pass 
-        
-
-# 按鈕區塊 (讓按鈕自己佔據整個寬度)
+# 步驟 1: 注入 CSS 來自訂按鈕大小和樣式
 st.markdown("""
     <style>
+    /* 按鈕基本樣式 */
     div.stButton > button {
         /* 調整按鈕的最小寬度 */
         min-width: 100%;
         /* 調整文字大小 */
-        font-size: 24px; 
+        font-size: 30px; 
         /* 調整內距（上下左右），讓按鈕更厚實 */
-        padding: 15px 10px; 
+        padding: 30px 5px; 
         /* 調整按鈕的圓角 */
-        border-radius: 10px;
+        border-radius: 18px;
         
         /* --- 顏色修改 (橘色) --- */
         background-color: #FF9900; 
@@ -269,18 +250,40 @@ st.markdown("""
         border: 1px solid #FFAA33;
     }
     
-    /* *** 移除舊的 CSS 對齊調整，讓圖片自由放在上方 *** */
-    div[data-testid="stHorizontalBlock"] > div:nth-child(2) div.stImage {
-        margin-top: 0px !important; 
+    /* *** 關鍵修改：垂直對齊圖片的 CSS 調整 *** */
+    /* 圖片在 st.columns 的第一個欄位 (div:nth-child(1)) 內 */
+    /* 使用 margin-top 將圖片向下推，讓它垂直居中於按鈕旁邊 */
+    div[data-testid="stHorizontalBlock"] > div:nth-child(1) div.stImage {
+        margin-top: 0px; 
     }
     
     </style>
     """, unsafe_allow_html=True)
-    
-# 按鈕邏輯
-if st.button("▶ 圈詞測試下一題"): 
-    # 播放詞彙 (中文 'zh-tw')
-    set_gtts_to_play(current_word, 'zh-tw') 
+
+# 步驟 2: 建立欄位佈局 (圖片在左, 按鈕在右)
+col_img, col_btn = st.columns([1, 4]) # 1:圖片寬度, 4:按鈕寬度
+
+with col_img:
+    try:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        image_path = os.path.join(current_dir, "Dolingo.jpg")
+        
+        # 顯示圖片 (寬度保持 70px)
+        st.image(image_path, width=150)
+    except Exception as e:
+        print(f"圖片讀取錯誤: {e}")
+        pass 
+        
+with col_btn:
+    # 按鈕邏輯
+    if st.button("▶ 圈詞測試下一題"): 
+        # 播放詞彙 (中文 'zh-tw')
+        set_gtts_to_play(current_word, 'zh-tw') 
+
+
+# 顯示文字 (只保留詞彙和翻譯)
+#st.write(f"**測驗詞彙：** **{current_word}**") 
+#st.write(f"**中文翻譯：** *{translation}*")
 
 
 # --- 單字答題表單 ---
