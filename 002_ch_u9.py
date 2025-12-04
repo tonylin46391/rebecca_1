@@ -261,7 +261,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # 步驟 2: 建立欄位佈局 (圖片在左, 按鈕在右)
-col_img, col_btn = st.columns([1, 4]) # 1:圖片寬度, 4:按鈕寬度
+col_img, col_btn = st.columns([1, 6]) # 1:圖片寬度, 4:按鈕寬度
 
 with col_img:
     try:
