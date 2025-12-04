@@ -6,6 +6,8 @@ import os
 # 引入 gTTS 來生成語音，以及 io 來處理音訊數據流
 from gtts import gTTS
 import io
+# 引入 time 用來控制停頓
+import time
 
 # 你的中文詞彙列表
 chinese_words = [
@@ -179,7 +181,29 @@ if st.session_state.last_message:
     
     font_size = "24px" 
     
-    if "答對了" in message or "複習完畢" in message or "全部答對" in message: 
+    # 檢查是否為正確或錯誤的訊息
+    is_correct_msg = "答對了" in message or "複習完畢" in message or "全部答對" in message
+    is_wrong_msg = "答錯" in message or "跳過" in message or "🔄" in message
+    
+    # --- 新增功能：顯示 Dolingo 圖片 ---
+    if is_correct_msg or is_wrong_msg:
+        # 使用 columns 將圖片置中，看起來更像彈出視窗
+        c1, c2, c3 = st.columns([1, 1, 1])
+        with c2:
+            try:
+                # 取得目前程式碼所在的資料夾路徑
+                current_dir = os.path.dirname(os.path.abspath(__file__))
+                # 組合出圖片的完整路徑
+                image_path = os.path.join(current_dir, "Dolingo.jpg")
+                
+                # 顯示圖片
+                st.image(image_path, width=150)
+            except Exception as e:
+                # 如果找不到圖片，印出錯誤訊息方便除錯（在網頁上不會顯示，但在終端機看得到）
+                print(f"圖片讀取錯誤: {e}")
+                pass 
+
+    if is_correct_msg: 
         display_message = message.replace("✅ ", "").replace("🎉 ", "").replace("💯 ", "")
 
         html_content = f"""
@@ -189,7 +213,7 @@ if st.session_state.last_message:
         """
         st.markdown(html_content, unsafe_allow_html=True)
         
-    elif "答錯" in message or "跳過" in message or "🔄" in message:
+    elif is_wrong_msg:
         
         display_message = message.replace("❌ ", "").replace("⏭️ ", "").replace("🔄 ", "")
         
@@ -203,6 +227,10 @@ if st.session_state.last_message:
     else:
         st.info(message)
     
+    # --- 新增功能：顯示後停頓 1.5 秒 ---
+    #if is_correct_msg or is_wrong_msg:
+    #    time.sleep(1.5)
+
     st.session_state.last_message = ""
         
 # --- 狀態模式顯示 ---
