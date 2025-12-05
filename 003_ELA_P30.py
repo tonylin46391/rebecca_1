@@ -7,6 +7,7 @@ import os
 from gtts import gTTS
 import io
 
+
 word_bank = [
     # --- High Frequency Words ---
     {"word": "baby", "translation": "嬰兒",
