@@ -8,6 +8,8 @@ from gtts import gTTS
 import io
 # 【新增】引入 difflib 進行字串差異比對
 import difflib 
+# 【新增】引入 re 進行正規表達式處理
+import re 
 
 # --- 【修正】自定義 CSS 樣式 (調整按鈕文字和大小) ---
 st.markdown("""
@@ -106,8 +108,6 @@ word_bank = [
      "definition": "Where something is located is where it is.",
      "definition_zh": "某物被定位（located）的地方就是它所在的位置。"},
 ]
-
-
 # --- 播放函式 (處理本地檔案) ---
 
 def play_local_audio(filename: str):
@@ -229,6 +229,33 @@ def get_diff_html(a: str, b: str) -> str:
     """
 # ----------------------------------------
 
+# --- 【新增】挖空例句函式 ---
+def get_sentence_with_blank(sentence: str, target_word: str, blank_index: int) -> str:
+    """
+    將句子中的目標單字替換為空白符號 (_____)，以供填空練習。
+    """
+    # 將句子分割成單字列表
+    words = sentence.split()
+    blank = "_____"
+    
+    if 0 <= blank_index < len(words):
+        word_to_blank = words[blank_index]
+        
+        # 找出結尾標點符號 (如 ., !, ?)
+        trailing_punctuation = ""
+        if word_to_blank and not word_to_blank[-1].isalnum():
+            # 如果最後一個字元不是英文字母或數字，就假設它是標點符號
+            trailing_punctuation = word_to_blank[-1]
+        
+        # 簡單化處理：直接替換 words 列表中的特定位置
+        words[blank_index] = blank + trailing_punctuation
+        
+        return ' '.join(words)
+
+    # 如果索引不正確，則返回原句 (作為安全機制)
+    return sentence
+# ----------------------------------------
+
 
 # --- 初始化 Session State ---
 total_questions = len(word_bank)
@@ -338,6 +365,12 @@ sentence = current_item["sentence"]
 sentence_zh = current_item["sentence_zh"]
 definition = current_item.get("definition", "N/A")
 definition_zh = current_item.get("definition_zh", "N/A") 
+# 【新增】取出 blank_index
+blank_index = current_item.get("blank_index", -1) 
+
+# 【新增】獲取帶有空白的例句
+sentence_with_blank = get_sentence_with_blank(sentence, current_word, blank_index)
+# ----------------------------------------
 
 
 # --- 標題與狀態顯示 ---
@@ -436,7 +469,8 @@ col_img, col_btn_word, col_btn_sentence, col_btn_definition = st.columns([1, 2, 
 with col_img:
     try:
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(current_dir, "Dolingo.jpg")
+        # ⚠️ 注意：這裡使用的是與您上傳圖片不同的本地檔案名稱，請確保檔案 Dolingo.jpg 存在。
+        image_path = os.path.join(current_dir, "Dolingo.jpg") 
         
         # 顯示圖片 (寬度調整為 70px)
         st.image(image_path, width=70) 
@@ -450,28 +484,33 @@ with col_btn_word:
         set_gtts_to_play(current_word, 'en')
     
 with col_btn_sentence:
+    # 這裡的按鈕發音還是使用原來的完整句子
     if st.button("▶ 例句（英）"):
         set_gtts_to_play(sentence, 'en')
     
 with col_btn_definition: 
     if st.button("▶ 定義（英）"):
         set_gtts_to_play(definition, 'en')
-# ----------------------------------------------------
 
-st.write(f"中文單字翻譯：**{translation}**")
-st.write(f"**英文例句：** *{sentence}*")
-st.write(f"**中文翻譯：** *{sentence_zh}*")
-st.markdown(f"**英文定義：** *{definition}*") 
-st.write(f"**中文定義：** *{definition_zh}*") 
+
+# 【新增/修正】單字呈現方式
+st.markdown(f"""
+<div style="background-color: #f7f7f7; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #ddd;">
+    <p style="font-size: 24px; color: #444; margin-bottom: 5px;">請填空：</p>
+    <p style="font-size: 32px; font-weight: bold; color: #1f77b4; line-height: 1.5;">{sentence_with_blank}</p>
+</div>
+""", unsafe_allow_html=True)
 
 
 # --- 單字答題表單 ---
 input_key = f"input_{current_index}_{st.session_state.study_mode}" 
 
 with st.form(key=f"form_{current_index}", clear_on_submit=True):
-    user_input = st.text_input("請輸入單字 (輸入完按 Enter 即可)", key=input_key, autocomplete="off")
+    # 【修正】修改提示文字
+    user_input = st.text_input(f"請輸入句中的空白單字", key=input_key, autocomplete="off")
     submitted = st.form_submit_button("提交答案 (或按 Enter)")
-    
+
+  
     if submitted:
         now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         user_text = user_input.strip().lower()
@@ -532,6 +571,14 @@ with st.form(key=f"form_{current_index}", clear_on_submit=True):
         })
 
         st.rerun() # 重新執行腳本
+
+ # ----------------------------------------------------
+
+st.write(f"中文單字翻譯：**{translation}**")
+st.write(f"**中文翻譯：** *{sentence_zh}*") # 將這個移到例句下方
+st.markdown(f"**英文定義：** *{definition}*") 
+st.write(f"**中文定義：** *{definition_zh}*") 
+       
 
 # --- 側邊欄統計 (保持不變) ---
 st.sidebar.header("📊 練習進度統計")
