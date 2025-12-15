@@ -57,56 +57,70 @@ div[data-testid="stHorizontalBlock"] > div:nth-child(1) div.stImage {
 </style>
 """, unsafe_allow_html=True)
 
-
 word_bank = [
     {"word": "agency", "translation": "代辦處；經銷處；政府機構",
      "sentence": "Many people worked at the agency.",
      "sentence_zh": "許多人在這家代辦處工作。",
      "definition": "If you work at an agency, your job is to help others to get something done.",
-     "definition_zh": "如果你在一家代辦處工作，你的工作就是幫助別人完成一些事情。"},
+     "definition_zh": "如果你在一家代辦處工作，你的工作就是幫助別人完成一些事情。",
+     "blank_index": 5 # agency 是第 6 個單字 (索引 4)
+     },
     
     {"word": "business", "translation": "生意；業務；商店",
      "sentence": "My aunt opened a small business that sells coffee.",
      "sentence_zh": "我阿姨開了一家賣咖啡的小店。",
      "definition": "A place open for business is ready to work, buy, or sell something.",
-     "definition_zh": "一個開放做生意的地方，就是準備好工作、購買或販售某物的場所。"},
+     "definition_zh": "一個開放做生意的地方，就是準備好工作、購買或販售某物的場所。",
+     "blank_index": 5 # business 是第 5 個單字 (索引 4)
+     },
      
     {"word": "confidently", "translation": "自信地；有信心地",
      "sentence": "Tia confidently stood up to give her report.",
      "sentence_zh": "Tia 自信地站起來做報告。",
      "definition": "When you do something confidently, you are sure you will do it well.",
-     "definition_zh": "當你自信地做某事時，你確信自己能做得很好。"},
+     "definition_zh": "當你自信地做某事時，你確信自己能做得很好。",
+     "blank_index": 1 # confidently 是第 2 個單字 (索引 1)
+     },
      
     {"word": "eagerly", "translation": "熱切地；渴望地",
      "sentence": "The family eagerly explored their new home.",
      "sentence_zh": "這家人熱切地探索他們的新家。",
      "definition": "When you do something eagerly, you really want to do it.",
-     "definition_zh": "當你熱切地做某事時，你真的很想做它。"},
+     "definition_zh": "當你熱切地做某事時，你真的很想做它。",
+     "blank_index": 2 # eagerly 是第 3 個單字 (索引 2)
+     },
      
     {"word": "seeps", "translation": "滲出；緩慢穿過",
      "sentence": "The sand seeps through the hourglass.",
      "sentence_zh": "沙子緩慢地從沙漏中滲出。",
      "definition": "When something seeps, it passes slowly through a small opening.",
-     "definition_zh": "當某物滲出時，它會緩慢地穿過一個小開口。"},
+     "definition_zh": "當某物滲出時，它會緩慢地穿過一個小開口。",
+     "blank_index": 2 # seeps 是第 3 個單字 (索引 2)
+     },
      
     {"word": "mystery", "translation": "謎；難以理解的事物",
      "sentence": "The contents of the box are a mystery.",
      "sentence_zh": "箱子裡的內容物是個謎。",
      "definition": "A mystery is something that is hard to understand or is not known about.",
-     "definition_zh": "謎是難以理解或不為人知的事物。"},
+     "definition_zh": "謎是難以理解或不為人知的事物。",
+     "blank_index": 7 # mystery. 是第 8 個單字 (索引 7)
+     },
      
     {"word": "ace", "translation": "高手；一流人才",
-     # 【修正】移除原單字中句子的 typo "an an"
      "sentence": "He is an ace athlete.",
      "sentence_zh": "他是一位一流的運動員。",
      "definition": "Someone described as an ace is extremely good at something.",
-     "definition_zh": "被描述為高手的人，在某方面是非常優秀的。"},
+     "definition_zh": "被描述為高手的人，在某方面是非常優秀的。",
+     "blank_index": 3 # ace 是第 4 個單字 (索引 3)
+     },
      
     {"word": "located", "translation": "位於；坐落於",
      "sentence": "The alligator pond was located near the center of the zoo.",
      "sentence_zh": "鱷魚池位於動物園的中心附近。",
      "definition": "Where something is located is where it is.",
-     "definition_zh": "某物被定位（located）的地方就是它所在的位置。"},
+     "definition_zh": "某物被定位（located）的地方就是它所在的位置。",
+     "blank_index": 4 # located 是第 5 個單字 (索引 4)
+     },
 ]
 # --- 播放函式 (處理本地檔案) ---
 
