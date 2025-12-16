@@ -464,7 +464,7 @@ with st.form(key=f"form_{current_index}", clear_on_submit=True):
         if parts[0].strip():
             st.markdown(f"""
             <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; padding: 10px 20px; min-height: 60px;">
-                <span style="font-size: 36px; font-weight: 500; color: #3c3c3c; line-height: 1.5;">
+                <span style="font-size: 36px; font-weight: 500; color: #FFD700; line-height: 1.5;">
                     {parts[0]}
                 </span>
             </div>
@@ -477,7 +477,7 @@ with st.form(key=f"form_{current_index}", clear_on_submit=True):
         if parts[1].strip():
             st.markdown(f"""
             <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; padding: 10px 20px; margin-top: 5px; min-height: 60px;">
-                <span style="font-size: 36px; font-weight: 500; color: #3c3c3c; line-height: 1.5;">
+                <span style="font-size: 36px; font-weight: 500; color: #FFD700; line-height: 1.5;">
                     {parts[1]}
                 </span>
             </div>
