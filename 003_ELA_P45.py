@@ -52,7 +52,7 @@ div[data-testid="stHorizontalBlock"] > div:nth-child(1) div.stImage {
 /* 輸入框樣式 - 模仿 Duolingo */
 .stTextInput > div > div > input {
     border: 3px solid #1CB0F6 !important;
-    background: #000000 !important;
+    background: #ffffff !important;
     font-size: 32px !important;
     font-weight: 600 !important;
     color: #1CB0F6 !important;
