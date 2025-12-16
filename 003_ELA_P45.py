@@ -494,7 +494,9 @@ with st.form(key=f"form_{current_index}", clear_on_submit=True):
 
         if is_correct:
             st.session_state.stats[current_index]["正確"] += 1
-            st.session_state.last_message = "✅ 答對了!" 
+            diff_html = get_diff_html(current_word, user_text)
+            msg_prefix = f"✅ 答對了!正確答案是:**{current_word}**"
+            st.session_state.last_message = f"HTML_DIFF_START{msg_prefix}|DIFF_SEP|{diff_html}HTML_DIFF_END"
             if current_index in st.session_state.wrong_queue:
                 st.session_state.wrong_queue.remove(current_index) 
             
