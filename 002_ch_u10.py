@@ -582,7 +582,7 @@ with st.form(key=f"form_{current_index}", clear_on_submit=True):
 
         st.rerun()
 
-# --- 側邊欄統計 ---
+# --- 側邊欄統計 --
 with st.sidebar:
     st.markdown("## 📊 學習統計")
     
