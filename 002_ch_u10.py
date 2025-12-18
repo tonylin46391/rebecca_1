@@ -7,13 +7,32 @@ import io
 import difflib
 import html
 
+# 設定頁面配置,側邊欄初始狀態為展開
+st.set_page_config(
+    page_title="中文詞彙聽力練習",
+    page_icon="🎧",
+    layout="centered",
+    initial_sidebar_state="expanded"
+)
+
 # --- Duolingo 風格 CSS 樣式 ---
 st.markdown("""
 <style>
-/* 隱藏 Streamlit 預設元素 */
+/* 隱藏 Streamlit 預設元素 - 但保留側邊欄控制按鈕 */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
-header {visibility: hidden;}
+
+/* 確保側邊欄控制按鈕可見 */
+button[kind="header"] {
+    visibility: visible !important;
+    display: block !important;
+}
+
+[data-testid="collapsedControl"] {
+    visibility: visible !important;
+    display: block !important;
+    z-index: 9999 !important;
+}
 
 /* 隱藏音訊播放器 */
 audio {
@@ -99,46 +118,6 @@ div.stButton > button:active {
     color: #3C3C3C !important;
     margin-bottom: 8px !important;
 }
-
-</style>
-<script>
-// 自動聚焦到輸入框
-function focusInput() {
-    const input = document.querySelector('input[type="text"]');
-    if (input && document.activeElement !== input) {
-        input.focus();
-    }
-}
-
-// 頁面載入時聚焦
-window.addEventListener('load', function() {
-    setTimeout(focusInput, 100);
-});
-
-// 監聽頁面變化，持續保持聚焦
-const observer = new MutationObserver(focusInput);
-observer.observe(document.body, {
-    childList: true,
-    subtree: true
-});
-
-// 每隔100ms檢查一次聚焦狀態
-setInterval(focusInput, 100);
-
-// 監聽所有可能導致失焦的事件
-document.addEventListener('click', function(e) {
-    // 如果點擊的不是輸入框，則重新聚焦
-    if (e.target.tagName !== 'INPUT') {
-        setTimeout(focusInput, 10);
-    }
-});
-
-// 監聽鍵盤事件，確保輸入時保持聚焦
-document.addEventListener('keydown', function() {
-    setTimeout(focusInput, 10);
-});
-</script>
-<style>
 
 /* 成功訊息樣式 */
 .success-message {
@@ -256,10 +235,50 @@ document.addEventListener('keydown', function() {
 </style>
 """, unsafe_allow_html=True)
 
+# JavaScript 用於自動聚焦
+st.markdown("""
+<script>
+// 自動聚焦到輸入框
+function focusInput() {
+    const input = window.parent.document.querySelector('input[type="text"]');
+    if (input && document.activeElement !== input) {
+        input.focus();
+    }
+}
+
+// 頁面載入時聚焦
+window.addEventListener('load', function() {
+    setTimeout(focusInput, 100);
+});
+
+// 監聽頁面變化,持續保持聚焦
+const observer = new MutationObserver(focusInput);
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});
+
+// 每隔100ms檢查一次聚焦狀態
+setInterval(focusInput, 100);
+
+// 監聽所有可能導致失焦的事件
+document.addEventListener('click', function(e) {
+    if (e.target.tagName !== 'INPUT') {
+        setTimeout(focusInput, 10);
+    }
+});
+
+// 監聽鍵盤事件,確保輸入時保持聚焦
+document.addEventListener('keydown', function() {
+    setTimeout(focusInput, 10);
+});
+</script>
+""", unsafe_allow_html=True)
+
 # 詞彙列表
 chinese_words = [ 
-    "冷風", "雪梨", "港口", "卻是", "冬天",
-    "台灣", "季節", "相反", "煙火", "點心",
+    "冷風", "雪梨", "港口", "廢棄", "冬天",
+    "台灣", "季節", "相同", "煙火", "點心",
     "等待", "綻放", "夜空", "照片", "分享",
     "雖然", "喜歡", "春節", "年貨", "期待", "年夜飯"
 ]
@@ -281,9 +300,9 @@ def play_local_audio(filename: str):
         with placeholder:
             st.audio(audio_bytes, format='audio/mp3', autoplay=True)
     except FileNotFoundError:
-        st.warning(f"⚠ 找不到音效檔案：'{filename}'")
+        st.warning(f"⚠ 找不到音效檔案:'{filename}'")
     except Exception as e:
-        st.error(f"播放音效時發生錯誤：{e}")
+        st.error(f"播放音效時發生錯誤:{e}")
 
 
 def set_gtts_to_play(text: str, lang: str):
@@ -313,24 +332,22 @@ def centralized_gtts_playback():
                 st.audio(fp, format="audio/mp3", autoplay=True)
             
         except Exception as e:
-            st.error(f"生成語音時發生錯誤：{e}")
+            st.error(f"生成語音時發生錯誤:{e}")
 
 
 def get_diff_html(a: str, b: str) -> str:
-    """生成差異化顯示的 HTML（中文版本）"""
-    # 中文不需要 lower()
+    """生成差異化顯示的 HTML(中文版本)"""
     s = difflib.SequenceMatcher(None, a, b)
 
     correct = []
     inputed = []
 
-    GREEN = "background:#58CC02;color:white;"  # 綠底白字
-    RED = "background:#FF4B4B;color:white;"     # 紅底白字
-    EMPTY = "background:#E5E5E5;color:white;"   # 灰底白字
+    GREEN = "background:#58CC02;color:white;"
+    RED = "background:#FF4B4B;color:white;"
+    EMPTY = "background:#E5E5E5;color:white;"
 
     def span(text, style):
         text = html.escape(text)
-        # 中文字符放大50%（23 * 1.5 = 34.5）
         return f"<span style='{style}display:inline-block;width:35px;height:45px;line-height:45px;margin:2px;border-radius:8px;font-family:Arial, sans-serif;text-align:center;font-size:27px;font-weight:600;'>{text}</span>"
 
     for opcode, a1, a2, b1, b2 in s.get_opcodes():
@@ -382,7 +399,7 @@ if "word_bank_hash" not in st.session_state or st.session_state.word_bank_hash !
     st.session_state.last_message = ""      
     st.session_state.gtts_to_play = None    
     st.session_state.local_sound_to_play = "" 
-    st.toast("🎉 新題庫已載入！")
+    st.toast("🎉 新題庫已載入!")
 else:
     if "last_message" not in st.session_state:
         st.session_state.last_message = ""
@@ -401,7 +418,7 @@ def go_next_question():
         else:
             st.session_state.study_mode = 'LEARNING'
             st.session_state.sequence_cursor = 0
-            st.session_state.last_message = "🎉 錯題複習完畢！開始新的一輪！"
+            st.session_state.last_message = "🎉 錯題複習完畢!開始新的一輪!"
             st.session_state.current_display_index = 0
     
     elif st.session_state.study_mode == 'LEARNING':
@@ -412,12 +429,12 @@ def go_next_question():
         else:
             if len(st.session_state.wrong_queue) > 0:
                 st.session_state.study_mode = 'REVIEW'
-                st.session_state.last_message = "🔄 一輪結束，進入錯題複習模式！"
+                st.session_state.last_message = "🔄 一輪結束,進入錯題複習模式!"
                 go_next_question()
             else:
                 st.session_state.sequence_cursor = 0
                 st.session_state.current_display_index = 0
-                st.session_state.last_message = "💯 太強了！全部答對，直接開始新的一輪！"
+                st.session_state.last_message = "💯 太強了!全部答對,直接開始新的一輪!"
 
 
 # --- 主介面 ---
@@ -452,7 +469,7 @@ if st.session_state.last_message:
             prefix_message = content
             diff_html_content = ""
         
-        display_message = prefix_message.replace("❌ ", "").replace("⏭️ ", "").replace("🔄 ", "")
+        display_message = prefix_message.replace("❌ ", "").replace("⭐️ ", "").replace("🔄 ", "")
         
         st.markdown(f"""
         <div class="error-message">
@@ -470,7 +487,7 @@ if st.session_state.last_message:
             st.markdown(f'<div class="success-message">✅ {display_message}</div>', unsafe_allow_html=True)
             
         elif is_wrong_msg:
-            display_message = message.replace("❌ ", "").replace("⏭️ ", "").replace("🔄 ", "")
+            display_message = message.replace("❌ ", "").replace("⭐️ ", "").replace("🔄 ", "")
             st.markdown(f'<div class="error-message">❌ {display_message}</div>', unsafe_allow_html=True)
         else:
             st.markdown(f'<div class="info-message">{message}</div>', unsafe_allow_html=True)
@@ -506,7 +523,7 @@ with col_btn:
         set_gtts_to_play(current_word, 'zh-tw')
     st.markdown('</div>', unsafe_allow_html=True)
 
-# 詞彙顯示（答對後顯示）
+# 詞彙顯示(答對後顯示)
 if st.session_state.last_message and "答對" in st.session_state.last_message:
     st.markdown(f'<div class="word-display">{current_word}</div>', unsafe_allow_html=True)
 
@@ -514,7 +531,7 @@ if st.session_state.last_message and "答對" in st.session_state.last_message:
 input_key = f"input_{current_index}_{st.session_state.study_mode}" 
 
 with st.form(key=f"form_{current_index}", clear_on_submit=True):
-    user_input = st.text_input("✍️ 請輸入你聽到的中文詞彙", key=input_key, autocomplete="off", placeholder="在此輸入...")
+    user_input = st.text_input("✏️ 請輸入你聽到的中文詞彙", key=input_key, autocomplete="off", placeholder="在此輸入...")
     submitted = st.form_submit_button("提交")
     
     if submitted:
@@ -525,9 +542,9 @@ with st.form(key=f"form_{current_index}", clear_on_submit=True):
         if is_correct:
             st.session_state.stats[current_index]["正確"] += 1
             
-            # 生成差異化顯示（答對時也顯示）
+            # 生成差異化顯示(答對時也顯示)
             diff_html = get_diff_html(current_word, user_text)
-            st.session_state.last_message = f"HTML_DIFF_START✅ 答對了！太棒了！|DIFF_SEP|{diff_html}HTML_DIFF_END"
+            st.session_state.last_message = f"HTML_DIFF_START✅ 答對了!太棒了!|DIFF_SEP|{diff_html}HTML_DIFF_END"
             
             if current_index in st.session_state.wrong_queue:
                 st.session_state.wrong_queue.remove(current_index) 
@@ -540,7 +557,7 @@ with st.form(key=f"form_{current_index}", clear_on_submit=True):
             
             # 生成差異化顯示
             diff_html = get_diff_html(current_word, user_text)
-            msg_prefix = f"❌ 答錯了！正確答案是：{current_word}" if user_text else f"⏭️ 跳過！正確答案是：{current_word}"
+            msg_prefix = f"❌ 答錯了!正確答案是:{current_word}" if user_text else f"⭐️ 跳過!正確答案是:{current_word}"
             st.session_state.last_message = f"HTML_DIFF_START{msg_prefix}|DIFF_SEP|{diff_html}HTML_DIFF_END"
             
             if current_index not in st.session_state.wrong_queue:
@@ -571,8 +588,8 @@ with st.sidebar:
     
     st.markdown(f"""
     <div class="stat-card">
-        <strong>學習模式：</strong>{st.session_state.study_mode}<br>
-        <strong>待複習題數：</strong>{len(st.session_state.wrong_queue)}
+        <strong>學習模式:</strong> {st.session_state.study_mode}<br>
+        <strong>待複習題數:</strong> {len(st.session_state.wrong_queue)}
     </div>
     """, unsafe_allow_html=True)
 
