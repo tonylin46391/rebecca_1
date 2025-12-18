@@ -59,7 +59,7 @@ audio {
 
 /* 標題樣式 */
 .title-text {
-    font-size: 42px;
+    font-size: 63px;
     font-weight: 700;
     color: #1CB0F6;
     text-align: left;
