@@ -59,10 +59,10 @@ audio {
 
 /* 標題樣式 */
 .title-text {
-    font-size: 32px;
+    font-size: 42px;
     font-weight: 700;
     color: #1CB0F6;
-    text-align: center;
+    text-align: left;
     margin-bottom: 24px;
 }
 
@@ -582,7 +582,7 @@ with st.form(key=f"form_{current_index}", clear_on_submit=True):
 
         st.rerun()
 
-# --- 側邊欄統計 --
+# --- 側邊欄統計 ---
 with st.sidebar:
     st.markdown("## 📊 學習統計")
     
