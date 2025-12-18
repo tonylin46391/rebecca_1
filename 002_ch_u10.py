@@ -377,7 +377,7 @@ def get_diff_html(a: str, b: str) -> str:
                 correct.append(span("_", EMPTY))
                 inputed.append(span(ch, RED))
 
-    return f"""<div style='text-align:center;margin-top:10px;margin-bottom:10px;'>
+    return f"""<div style='text-align:left;margin-top:10px;margin-bottom:10px;'>
         <div style='margin-bottom:5px;'>{''.join(correct)}</div>
         <div style='font-size:15px;margin:5px;color:#666;'>⬇️</div>
         <div>{''.join(inputed)}</div>
