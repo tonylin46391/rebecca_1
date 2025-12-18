@@ -127,7 +127,7 @@ div.stButton > button:active {
     border-radius: 16px;
     font-size: 20px;
     font-weight: 700;
-    text-align: center;
+    text-align: left;
     margin: 20px 0;
     box-shadow: 0 4px 12px rgba(88, 204, 2, 0.3);
 }
@@ -140,7 +140,7 @@ div.stButton > button:active {
     border-radius: 0px;
     font-size: 16px;
     font-weight: 700;
-    text-align: center;
+    text-align: left;
     margin: 10px 0;
     box-shadow: none;
 }
@@ -153,7 +153,7 @@ div.stButton > button:active {
     border-radius: 16px;
     font-size: 18px;
     font-weight: 700;
-    text-align: center;
+    text-align: left;
     margin: 20px 0;
     box-shadow: 0 4px 12px rgba(28, 176, 246, 0.3);
 }
