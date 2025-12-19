@@ -36,12 +36,22 @@ button[kind="header"] {
 }
 
 /* 隱藏音訊播放器 */
-audio {
+/*audio {
     display: none !important;
 }
 
 .stAudio {
     display: none !important;
+}*/
+
+audio {
+    display: block !important;
+    width: 100% !important;
+    margin: 10px 0 !important;
+}
+
+.stAudio {
+    display: block !important;
 }
 
 /* 頁面背景色 */
