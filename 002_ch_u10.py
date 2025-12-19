@@ -59,7 +59,7 @@ audio {
 
 /* 標題樣式 */
 .title-text {
-    font-size: 63px;
+    font-size: 100px;
     font-weight: 700;
     color: #1CB0F6;
     text-align: left;
@@ -277,7 +277,7 @@ document.addEventListener('keydown', function() {
 
 # 詞彙列表
 chinese_words = [ 
-    "冷風", "雪梨", "港口", "廢棄", "冬天",
+    "冷風", "雪梨", "港口", "卻是", "冬天",
     "台灣", "季節", "相同", "煙火", "點心",
     "等待", "綻放", "夜空", "照片", "分享",
     "雖然", "喜歡", "春節", "年貨", "期待", "年夜飯"
