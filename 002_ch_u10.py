@@ -6,6 +6,7 @@ from gtts import gTTS
 import io
 import difflib
 import html
+import time
 
 # 設定頁面配置,側邊欄初始狀態為展開
 st.set_page_config(
@@ -48,18 +49,9 @@ audio {
     background-color: #F7F7F7;
 }
 
-/* 主要卡片樣式 */
-.main-card {
-    background: white;
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin: 20px 0;
-}
-
 /* 標題樣式 */
 .title-text {
-    font-size: 100px;
+    font-size: 32px;
     font-weight: 700;
     color: #1CB0F6;
     text-align: left;
@@ -170,22 +162,6 @@ div.stButton > button:active {
     box-shadow: 0 4px 12px rgba(255, 150, 0, 0.3);
 }
 
-/* 進度條樣式 */
-.progress-bar {
-    width: 100%;
-    height: 16px;
-    background-color: #E5E5E5;
-    border-radius: 8px;
-    overflow: hidden;
-    margin: 20px 0;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #58CC02 0%, #61E002 100%);
-    transition: width 0.3s ease;
-}
-
 /* 側邊欄樣式 */
 [data-testid="stSidebar"] {
     background-color: #FFFFFF;
@@ -208,20 +184,6 @@ div.stButton > button:active {
     50% { transform: translateY(-10px); }
 }
 
-/* 詞彙顯示區域 */
-.word-display {
-    background: linear-gradient(135deg, #FFC800 0%, #FFD700 100%);
-    color: white;
-    font-size: 48px;
-    font-weight: 900;
-    text-align: center;
-    padding: 40px;
-    border-radius: 20px;
-    margin: 30px 0;
-    box-shadow: 0 8px 16px rgba(255, 200, 0, 0.3);
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-}
-
 /* 統計卡片 */
 .stat-card {
     background: white;
@@ -238,7 +200,6 @@ div.stButton > button:active {
 # JavaScript 用於自動聚焦
 st.markdown("""
 <script>
-// 自動聚焦到輸入框
 function focusInput() {
     const input = window.parent.document.querySelector('input[type="text"]');
     if (input && document.activeElement !== input) {
@@ -246,29 +207,24 @@ function focusInput() {
     }
 }
 
-// 頁面載入時聚焦
 window.addEventListener('load', function() {
     setTimeout(focusInput, 100);
 });
 
-// 監聽頁面變化,持續保持聚焦
 const observer = new MutationObserver(focusInput);
 observer.observe(document.body, {
     childList: true,
     subtree: true
 });
 
-// 每隔100ms檢查一次聚焦狀態
 setInterval(focusInput, 100);
 
-// 監聽所有可能導致失焦的事件
 document.addEventListener('click', function(e) {
     if (e.target.tagName !== 'INPUT') {
         setTimeout(focusInput, 10);
     }
 });
 
-// 監聽鍵盤事件,確保輸入時保持聚焦
 document.addEventListener('keydown', function() {
     setTimeout(focusInput, 10);
 });
@@ -296,9 +252,7 @@ def play_local_audio(filename: str):
     """播放本地音效檔案"""
     try:
         audio_bytes = open(filename, 'rb').read()
-        placeholder = st.empty()
-        with placeholder:
-            st.audio(audio_bytes, format='audio/mp3', autoplay=True)
+        st.audio(audio_bytes, format='audio/mp3', autoplay=True)
     except FileNotFoundError:
         st.warning(f"⚠ 找不到音效檔案:'{filename}'")
     except Exception as e:
@@ -306,9 +260,10 @@ def play_local_audio(filename: str):
 
 
 def set_gtts_to_play(text: str, lang: str):
-    """設定要播放的 TTS 文字"""
+    """設定要播放的 TTS 文字並加入時間戳記"""
     if text:
-        st.session_state.gtts_to_play = (text, lang)
+        # 使用時間戳記確保每次都是新的播放請求
+        st.session_state.gtts_to_play = (text, lang, time.time())
         st.rerun()
     else:
         st.warning("⚠ 播放內容為空")
@@ -317,10 +272,8 @@ def set_gtts_to_play(text: str, lang: str):
 def centralized_gtts_playback():
     """集中處理 gTTS 音訊播放"""
     if st.session_state.gtts_to_play is not None:
-        text, lang = st.session_state.gtts_to_play
+        text, lang, timestamp = st.session_state.gtts_to_play
         st.session_state.gtts_to_play = None
-        
-        placeholder = st.empty() 
         
         try:
             tts = gTTS(text=text, lang=lang)
@@ -328,8 +281,8 @@ def centralized_gtts_playback():
             tts.write_to_fp(fp)
             fp.seek(0)
             
-            with placeholder:
-                st.audio(fp, format="audio/mp3", autoplay=True)
+            # 直接播放，不使用 placeholder
+            st.audio(fp, format="audio/mp3", autoplay=True)
             
         except Exception as e:
             st.error(f"生成語音時發生錯誤:{e}")
@@ -519,13 +472,9 @@ with col_img:
 
 with col_btn:
     st.markdown('<div style="padding-top: 0px;">', unsafe_allow_html=True)
-    if st.button("🔊 播放詞彙發音"): 
+    if st.button("🔊 播放詞彙發音", key=f"play_btn_{current_index}"): 
         set_gtts_to_play(current_word, 'zh-tw')
     st.markdown('</div>', unsafe_allow_html=True)
-
-# 詞彙顯示(答對後顯示)
-if st.session_state.last_message and "答對" in st.session_state.last_message:
-    st.markdown(f'<div class="word-display">{current_word}</div>', unsafe_allow_html=True)
 
 # 答題表單
 input_key = f"input_{current_index}_{st.session_state.study_mode}" 
